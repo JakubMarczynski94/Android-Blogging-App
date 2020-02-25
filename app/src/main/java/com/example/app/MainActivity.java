@@ -12,12 +12,10 @@ import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         BottomNavigationView navView = (BottomNavigationView)findViewById(R.id.nav_view);
 
@@ -60,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         // Capture button clicks
         buttonCompanies.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-
                 // Start Companies.class
                 Intent myIntent = new Intent(MainActivity.this,
                         Companies.class);
@@ -69,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // companies button above
-
          */
 
 
