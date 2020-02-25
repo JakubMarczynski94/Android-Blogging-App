@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">App</string>
+    <string name="title_home">Featured</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Apply</string>
+    <string name="contact">Contact</string>
+    <string name="forum_epfl">Forum EPFL</string>
+    <string name="dashboard">Forum EPFL, Dashboard</string>
+    <string name="companies">Companies</string>
+    <string name="about">About</string>
+    <string name="map">Map</string>
+</resources>
