@@ -20,6 +20,30 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
 public class Dashboard extends AppCompatActivity {
 
 
@@ -36,7 +60,16 @@ public class Dashboard extends AppCompatActivity {
 
     /*---------------------- END of LOGIN VAR--------------------*/
 
-    // the navigation toolbar which we already know works
+    // -------------------- beginning of variables for chat --------------
+
+    ListView usersList;
+    TextView noUsersText;
+    ArrayList<String> al = new ArrayList<>();
+    int totalUsers = 0;
+    ProgressDialog pd;
+
+    // -------------------------------------- end of variables for chat ----------------
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -265,7 +298,39 @@ public class Dashboard extends AppCompatActivity {
             }
         });
 
-        /* ------------------------------------------------ */
+        // ------------------------------------------------ CHAT PART -----------------
+
+        usersList = (ListView)findViewById(R.id.usersList);
+        noUsersText = (TextView)findViewById(R.id.noUsersText);
+
+        String url = "https://appdata-67dc1.firebaseio.com/users.json";
+
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
+
+            @Override
+            public void onResponse(String s) {
+                doOnSuccess(s);
+            }
+        },new Response.ErrorListener(){
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                System.out.println("" + volleyError);
+            }
+        });
+
+        RequestQueue rQueue = Volley.newRequestQueue(Dashboard.this);
+        rQueue.add(request);
+
+        usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                UserDetails.chatWith = al.get(position);
+                startActivity(new Intent(Dashboard.this, Chat.class));
+            }
+        });
+
+        // -------------------- END OF CHAT PART ------------------------------------------------------
     }
 
     //sign out method
@@ -291,6 +356,44 @@ public class Dashboard extends AppCompatActivity {
             auth.removeAuthStateListener(authListener);
         }
     }
+
+// CHAT PART
+
+    public void doOnSuccess(String s){
+        try {
+            JSONObject obj = new JSONObject(s);
+
+            Iterator i = obj.keys();
+            String key = "";
+
+            while(i.hasNext()){
+                key = i.next().toString();
+
+                if(!key.equals(
+                        UserDetails.email
+                )) {
+                    al.add(key);
+                }
+
+                totalUsers++;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if(totalUsers <=1){
+            noUsersText.setVisibility(View.VISIBLE);
+            usersList.setVisibility(View.GONE);
+        }
+        else{
+            noUsersText.setVisibility(View.GONE);
+            usersList.setVisibility(View.VISIBLE);
+            usersList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, al));
+        }
+
+    }
+
 }
 
 
