@@ -94,7 +94,19 @@ public class SignupActivity extends AppCompatActivity {
                                 } else {
 
                                     /** added with chat **/
-                                    UserDetails user = new UserDetails();
+                                    UserDetails.email = email;
+                                    UserDetails.password = password;
+                                    UserDetails.chatWith = "";
+
+                                    class User{
+                                        public String email;
+                                        public String password;
+                                        public String chatWith = "";
+
+                                        User(){}
+                                    }
+
+                                    User user = new User();
                                     user.email = email;
                                     user.password = password;
                                     user.chatWith = "";
