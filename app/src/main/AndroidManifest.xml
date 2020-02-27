@@ -30,8 +30,13 @@
         <activity android:name=".LoginActivity" ></activity>
         <activity android:name=".ResetPasswordActivity"></activity>
 
+        <!-- added for chat -->
+
+        <activity android:name=".UserDetails" />
+
     </application>
 
     <!-- added after login -->
     <uses-permission android:name="android.permission.INTERNET" />
+
 </manifest>
