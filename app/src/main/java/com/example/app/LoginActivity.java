@@ -15,6 +15,25 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText inputEmail, inputPassword;
@@ -63,7 +82,10 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = inputEmail.getText().toString();
+
+                /* maybe no need to declare final, changed with chat on email*/
+
+                final String email = inputEmail.getText().toString();
                 final String password = inputPassword.getText().toString();
 
                 if (TextUtils.isEmpty(email)) {
@@ -93,12 +115,34 @@ public class LoginActivity extends AppCompatActivity {
                                         Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
                                     }
                                 } else {
+
+
                                     Intent intent = new Intent(LoginActivity.this, Dashboard.class);
                                     startActivity(intent);
                                     finish();
                                 }
                             }
                         });
+
+                /* ---------------- added with chat ------------------------------*/
+
+                /*
+                String url = "https://appdata-67dc1.firebaseio.com//users.json";
+
+                StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+                    public void onResponse(String s) {
+
+                        JSONObject obj = new JSONObject(s);
+
+                        UserDetails.username = user;
+                        UserDetails.password = pass;
+                    }
+                });
+                RequestQueue rQueue = Volley.newRequestQueue(LoginActivity.this);
+                rQueue.add(request);
+
+                */
+
             }
         });
     }
