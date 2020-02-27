@@ -6,6 +6,9 @@ public class UserDetails {
     static String password = "";
     static String chatWith = "";
 
+    static String getEmail(){
+        return email;
+    }
 
     /*
     public String email = "";
