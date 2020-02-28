@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.app">
+    <!-- added after login -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -9,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
 
         <activity
             android:name=".MainActivity"
@@ -20,25 +23,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Companies" ></activity>
-        <activity android:name=".Dashboard" ></activity>
-        <activity android:name=".Apply" ></activity>
-
-
-        <!-- added after login -->
-        <activity android:name=".SignupActivity" ></activity>
-        <activity android:name=".LoginActivity" ></activity>
-        <activity android:name=".ResetPasswordActivity"></activity>
-
-        <!-- added for chat -->
-
+        <activity android:name=".Companies" />
+        <activity android:name=".Dashboard" />
+        <activity android:name=".Apply" /> <!-- added after login -->
+        <activity android:name=".SignupActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".ResetPasswordActivity" /> <!-- added for chat -->
         <activity android:name=".UserDetails" />
-        <activity android:name=".Chat" />
-
+        <activity android:name=".Chat" /> <!-- added for post -->
+        <activity android:name=".NewPostActivity" />
     </application>
-
-    <!-- added after login -->
-
-    <uses-permission android:name="android.permission.INTERNET" />
-
 </manifest>

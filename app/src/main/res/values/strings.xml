@@ -40,4 +40,6 @@
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
     <string name="prompt_password"> input password</string>
+    <string name="post_desc_hint">Write your post</string>
+    <string name="new_post_btn_hint">Post</string>
 </resources>

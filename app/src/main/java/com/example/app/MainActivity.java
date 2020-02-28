@@ -2,6 +2,8 @@ package com.example.app;
 import android.os.Bundle;
 import android.content.Intent;
 import android.view.MenuItem;
+import android.view.View;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,8 +11,13 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
+
+    // for adding post
+    private FloatingActionButton addPostBtn;
+    // end of for adding post
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +54,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    }
 
+        // ---------------- Post part ----------------
+
+        addPostBtn = findViewById(R.id.add_post_btn);
+
+        addPostBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // the button actually works, the problem is not the button itself but what happens in the class
+                Intent newPostIntent = new Intent(MainActivity.this, NewPostActivity.class);
+                startActivity(newPostIntent);
+            }
+        });
+
+    }
 }
-    // TODO : manage button for companies
+    //
         /*
         Button buttonCompanies;
         buttonCompanies = (Button) findViewById(R.id.button_companies);
