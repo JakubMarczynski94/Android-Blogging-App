@@ -109,12 +109,15 @@ public class Dashboard extends AppCompatActivity {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         authListener = new FirebaseAuth.AuthStateListener() {
+
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+
                 if (user == null) {
                     // user auth state is changed - user is null
-                    // launch login activity
+                    // launch login activity, we get to this part but then the LoginActivity is having trouble launching
                     startActivity(new Intent(Dashboard.this, LoginActivity.class));
                     finish();
                 }
@@ -306,46 +309,49 @@ public class Dashboard extends AppCompatActivity {
         usersList = (ListView)findViewById(R.id.usersList);
         noUsersText = (TextView)findViewById(R.id.noUsersText);
 
-        // this is the url of our table that contains in the users sub-table the information about the users
-        String url = "https://appdata-67dc1.firebaseio.com/users.json";
+        if(user != null) {
+            // this is the url of our table that contains in the users sub-table the information about the users
+            String url = "https://appdata-67dc1.firebaseio.com/users.json";
 
-        // Finds the text on the internet, and you can retrieve it. With this you make an HTTP request that has to be made
-        // and you parse it as a string. This request specifies the method, the url, and the listeners invoked when you have a success or a failure
-        StringRequest request = new StringRequest(Request.Method.GET, url,
+            // Finds the text on the internet, and you can retrieve it. With this you make an HTTP request that has to be made
+            // and you parse it as a string. This request specifies the method, the url, and the listeners invoked when you have a success or a failure
 
-                new Response.Listener<String>(){
-                    @Override
-                    public void onResponse(String s) {
-                        doOnSuccess(s);
-                    }},
+            StringRequest request = new StringRequest(Request.Method.GET, url,
 
-                new Response.ErrorListener(){
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        System.out.println("" + volleyError);
-                    }
-                 });
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String s) {
+                            doOnSuccess(s);
+                        }
+                    },
 
-        RequestQueue rQueue = Volley.newRequestQueue(Dashboard.this);
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            System.out.println("" + volleyError);
+                        }
+                    });
 
-        // meaning you add the above request into the queu, which is managed by the volley class
-        rQueue.add(request);
+            RequestQueue rQueue = Volley.newRequestQueue(Dashboard.this);
 
-        // adapterview extends viewgroup, generally takes in an array as parameter
-        // OnItemClickListener is an interface definition for a call back to be invoked when an item in this adapterview has been clicked
-        usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            // meaning you add the above request into the queu, which is managed by the volley class
+            rQueue.add(request);
 
-            @Override
-            // adapterview where the click happened, the view within the adapterview that was clicked, the position of the view within the adapter, the row id of the item that was clicked
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // adapterview extends viewgroup, generally takes in an array as parameter
+            // OnItemClickListener is an interface definition for a call back to be invoked when an item in this adapterview has been clicked
+            usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                // chat with the person which was clicked in this array that we are considering, at the right position
-                UserDetails.chatWith = al.get(position);
-                // when clicked we move from this class to the other class, which itself will have a new layout
-                startActivity(new Intent(Dashboard.this, Chat.class));
-            }
-        });
+                @Override
+                // adapterview where the click happened, the view within the adapterview that was clicked, the position of the view within the adapter, the row id of the item that was clicked
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                    // chat with the person which was clicked in this array that we are considering, at the right position
+                    UserDetails.chatWith = al.get(position);
+                    // when clicked we move from this class to the other class, which itself will have a new layout
+                    startActivity(new Intent(Dashboard.this, Chat.class));
+                }
+            });
+        }
         // -------------------- END OF CHAT PART ------------------------------------------------------
     }
 

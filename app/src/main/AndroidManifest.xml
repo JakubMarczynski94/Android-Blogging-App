@@ -38,5 +38,14 @@
         <activity android:name=".NewPostActivity"/>
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity" />
 
+        <!-- added for display -->
+        <activity android:name=".BlogPost"/>
+        <activity android:name=".BlogPostId"/>
+        <activity android:name=".BlogRecyclerAdapter"/>
+        <activity android:name=".CommentsActivity"/>
+        <activity android:name=".Comments"/>
+        <activity android:name=".CommentsRecyclerAdapter"/>
+        <activity android:name=".FeaturingFragment"/>
+
     </application>
 </manifest>

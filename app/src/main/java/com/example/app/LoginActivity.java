@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -43,17 +44,17 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
 
         //Get Firebase auth instance
+        /*
         auth = FirebaseAuth.getInstance();
 
         if (auth.getCurrentUser() != null) {
             startActivity(new Intent(LoginActivity.this, Dashboard.class));
             finish();
         }
-
-        // set the view now
-        setContentView(R.layout.activity_login);
+        */
 
 
         inputEmail = (EditText) findViewById(R.id.email);
@@ -62,8 +63,6 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = (Button) findViewById(R.id.btn_login);
         btnReset = (Button) findViewById(R.id.btn_reset_password);
 
-        //Get Firebase auth instance
-        auth = FirebaseAuth.getInstance();
 
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,6 +97,7 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
+                auth = FirebaseAuth.getInstance();
                 //authenticate user
                 auth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
