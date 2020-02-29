@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         BottomNavigationView navView = (BottomNavigationView)findViewById(R.id.nav_view);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         // ---------------- Post part ----------------
+
+        // careful to click on this button only when you are signed in
 
         addPostBtn = findViewById(R.id.add_post_btn);
 
