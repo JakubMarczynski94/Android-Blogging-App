@@ -6,6 +6,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -125,13 +128,13 @@ public class Dashboard extends AppCompatActivity {
 
     private EditText setupName;
     private Button setupBtn;
-    private ProgressBar setupProgress;
 
     private StorageReference storageReference;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
 
     private Bitmap compressedImageFile;
+    String download_uri;
 
     // ---------------------------- end of variables for setup
 
@@ -413,11 +416,144 @@ public class Dashboard extends AppCompatActivity {
                     startActivity(new Intent(Dashboard.this, Chat.class));
                 }
             });
-
+            // -------------------- END OF CHAT PART ------------------------------------------------------
             // -- setup part when user is non null meaning the user is authenticated
 
+            user_id = auth.getCurrentUser().getUid();
+
+            firebaseFirestore = FirebaseFirestore.getInstance();
+            storageReference = FirebaseStorage.getInstance().getReference();
+
+            setupImage = findViewById(R.id.setup_image);
+            setupName = findViewById(R.id.setup_name);
+            setupBtn = findViewById(R.id.setup_btn);
+
+            firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                    if(task.isSuccessful()) {
+
+                        if (task.getResult().exists()) {
+
+                            String name = task.getResult().getString("name");
+                            setupName.setText(name);
+
+                            if (task.getResult().getString("image") != null) {
+
+                                String image = task.getResult().getString("image");
+
+                                mainImageURI = Uri.parse(image);
+
+                                RequestOptions placeholderRequest = new RequestOptions();
+                                placeholderRequest.placeholder(R.drawable.default_image);
+
+                                Glide.with(Dashboard.this).setDefaultRequestOptions(placeholderRequest).load(image).into(setupImage);
+
+                            }
+
+                        } else {
+
+                            if (task.getException() != null){
+                                String error = task.getException().getMessage();
+                                Toast.makeText(Dashboard.this, "(FIRESTORE Retrieve Error) : " + error, Toast.LENGTH_LONG).show();
+                             }
+                        }
+                    }
+                }
+            });
+
+
+            setupBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    final String user_name = setupName.getText().toString();
+
+                    if (!TextUtils.isEmpty(user_name) && mainImageURI != null) {
+
+                        if (isChanged) {
+
+                            user_id = auth.getCurrentUser().getUid();
+
+                            File newImageFile = new File(mainImageURI.getPath());
+                            try {
+
+                                compressedImageFile = new Compressor(Dashboard.this)
+                                        .setMaxHeight(125)
+                                        .setMaxWidth(125)
+                                        .setQuality(50)
+                                        .compressToBitmap(newImageFile);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            compressedImageFile.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                            byte[] thumbData = baos.toByteArray();
+
+                            UploadTask image_path = storageReference.child("profile_images").child(user_id + ".jpg").putBytes(thumbData);
+
+                            image_path.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                                    if (task.isSuccessful()) {
+                                        storeFirestore(task, user_name);
+
+                                    } else {
+
+                                        String error = task.getException().getMessage();
+                                        Toast.makeText(Dashboard.this, "(IMAGE Error) : " + error, Toast.LENGTH_LONG).show();
+
+                                    }
+                                }
+                            });
+
+                        } else {
+
+                            storeFirestore(null, user_name);
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+            setupImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+
+                        if(ContextCompat.checkSelfPermission(Dashboard.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+
+                            Toast.makeText(Dashboard.this, "Permission Denied", Toast.LENGTH_LONG).show();
+                            ActivityCompat.requestPermissions(Dashboard.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+
+                        } else {
+
+                            BringImagePicker();
+
+                        }
+
+                    } else {
+
+                        BringImagePicker();
+
+                    }
+
+                }
+
+            });
+
+            // -------------------------- end of setup -----------------
+
         }
-        // -------------------- END OF CHAT PART ------------------------------------------------------
+
     }
 
     //sign out method
@@ -499,6 +635,103 @@ public class Dashboard extends AppCompatActivity {
 
     }
 
+    // ---------------------- setup methods ----------------------
+
+    private void storeFirestore(@NonNull Task<UploadTask.TaskSnapshot> task, String user_name) {
+
+
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        String user_id = auth.getCurrentUser().getUid();
+
+       // if(task != null) {
+            // removed the getResult() before getMetadata
+            // download_uri = task.getResult().getMetadata().getReference().getDownloadUrl().toString();
+            // download_uri = task.getResult().toString();
+
+         storageRef.child("profile_images").child(user_id + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+
+                @Override
+                public void onSuccess(Uri uri) {
+                    download_uri = uri.toString();
+                }
+
+            }).addOnFailureListener(new OnFailureListener() {
+
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+
+                    Toast.makeText(Dashboard.this, "No profile image found yet", Toast.LENGTH_LONG).show();
+                }
+            });
+
+       // } else {
+
+       //     download_uri = mainImageURI.toString();
+
+      //  }
+
+        if (download_uri== null){
+            download_uri = mainImageURI.toString();
+            Toast.makeText(Dashboard.this, "Profile image set to null", Toast.LENGTH_LONG).show();
+        }
+
+        Map<String, String> userMap = new HashMap<>();
+        userMap.put("name", user_name);
+        userMap.put("image", download_uri);
+
+        firebaseFirestore.collection("Users").document(user_id).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if(task.isSuccessful()){
+
+                    Toast.makeText(Dashboard.this, "The user Settings are updated.", Toast.LENGTH_LONG).show();
+                    //Intent mainIntent = new Intent(Dashboard.this, MainActivity.class);
+                    //startActivity(mainIntent);
+                    //finish();
+
+                } else {
+
+                    String error = task.getException().getMessage();
+                    Toast.makeText(Dashboard.this, "(FIRESTORE Error) : " + error, Toast.LENGTH_LONG).show();
+
+                }
+
+            }
+        });
+
+
+    }
+
+    private void BringImagePicker() {
+
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAspectRatio(1, 1)
+                .start(Dashboard.this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+
+                mainImageURI = result.getUri();
+                setupImage.setImageURI(mainImageURI);
+
+                isChanged = true;
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+
+                Exception error = result.getError();
+
+            }
+        }
+
+    }
 }
 
 
