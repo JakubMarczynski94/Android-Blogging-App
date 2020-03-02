@@ -1,7 +1,7 @@
 package com.example.app;
 import com.google.firebase.firestore.ServerTimestamp;
-
 import java.util.Date;
+// comments added
 
 public class BlogPost extends BlogPostId {
 
@@ -9,8 +9,10 @@ public class BlogPost extends BlogPostId {
     public String user_id, image_url, desc, image_thumb;
     public Date timestamp;
 
+    // we implement an empty constructor
     public BlogPost() {}
 
+    // with this constructor you specify each attribute of this class that we are considering
     public BlogPost(String user_id, String image_url, String desc, String image_thumb, Date timestamp) {
         this.user_id = user_id;
         this.image_url = image_url;
@@ -23,6 +25,7 @@ public class BlogPost extends BlogPostId {
         return user_id;
     }
 
+    // we set the user_id parameter of this instance of this class
     public void setUser_id(String user_id) {
         this.user_id = user_id;
     }
