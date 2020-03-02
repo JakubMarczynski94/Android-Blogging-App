@@ -551,7 +551,6 @@ public class Dashboard extends AppCompatActivity {
             });
 
             // -------------------------- end of setup -----------------
-
         }
 
     }
