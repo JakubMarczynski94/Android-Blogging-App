@@ -64,7 +64,9 @@ public class NewPostActivity extends AppCompatActivity {
 
     private Bitmap compressedImageFile;
 
-
+    //
+    String downloadUri;
+    String downloadthumbUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,8 +164,29 @@ public class NewPostActivity extends AppCompatActivity {
                     filePath.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
-                            // download the image to firestore
-                            final String downloadUri = task.getResult().getMetadata().getReference().getDownloadUrl().toString();
+
+                            // download the image to firestore ---------------------
+
+                            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+
+                            storageRef.child("post_images").child(randomName + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    downloadUri = uri.toString();
+                                }
+
+                            }).addOnFailureListener(new OnFailureListener() {
+
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+
+                                    Toast.makeText(NewPostActivity.this, "Image not added to storage and database", Toast.LENGTH_LONG).show();
+                                }
+                            });
+
+                            //---------------------------------------------
+                            // final String downloadUri = task.getResult().getMetadata().getReference().getDownloadUrl().toString();
 
                             if(task.isSuccessful()){
 
@@ -196,8 +219,27 @@ public class NewPostActivity extends AppCompatActivity {
 
                                         // this getreference() etc is correct because there was an upload into the storage space
 
-                                        String downloadthumbUri = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
+                                        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
 
+                                        storageRef.child("post_images/thumbs").child(randomName + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                downloadthumbUri = uri.toString();
+                                            }
+
+                                        }).addOnFailureListener(new OnFailureListener() {
+
+                                            @Override
+                                            public void onFailure(@NonNull Exception exception) {
+
+                                                Toast.makeText(NewPostActivity.this, "Thumbnail image not added to storage and database", Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+
+                                        // String downloadthumbUri = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
+
+                                        // TODO: for the moment the thumburl does not appear in the database storage despite code above
                                         // key type string, value type is general object, we can put multiple values
                                         Map<String, Object> postMap = new HashMap<>();
                                         postMap.put("image_url", downloadUri);
