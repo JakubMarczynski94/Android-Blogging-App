@@ -1,9 +1,6 @@
 package com.example.app;
-
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -16,7 +13,6 @@ import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,10 +26,8 @@ import com.google.firebase.firestore.ServerTimestamp;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -41,30 +35,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-
 import id.zelory.compressor.Compressor;
+// comments added
 
 public class NewPostActivity extends AppCompatActivity {
-
-    // private Toolbar newPostToolbar;
 
     private ImageView newPostImage;
     private EditText newPostDesc;
     private Button newPostBtn;
-
     private Uri postImageUri = null;
-
     private ProgressBar newPostProgress;
-
     private StorageReference storageReference;
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
-
     private String current_user_id;
-
     private Bitmap compressedImageFile;
 
-    //
+    // variables added with displaying the post part
     String downloadUri;
     String downloadthumbUri;
 
@@ -74,27 +61,17 @@ public class NewPostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_post);
 
-        // need to initialize the objects
+        // need to initialize the references to firebase
         storageReference = FirebaseStorage.getInstance().getReference();
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
 
         current_user_id = firebaseAuth.getCurrentUser().getUid();
 
-        // the problem is this that we set the support action bar as this new post toolbar, because
-        // it would seem like we already have a support action bar with app on it, and we can not have more than one
-
-        // newPostToolbar = findViewById(R.id.new_post_toolbar);
-        // setSupportActionBar(newPostToolbar);
-        // getSupportActionBar().setTitle("Add New Post");
-        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
         newPostImage = findViewById(R.id.new_post_image);
         newPostDesc = findViewById(R.id.new_post_desc);
         newPostBtn = findViewById(R.id.post_btn);
         newPostProgress = findViewById(R.id.new_post_progress);
-
 
         newPostImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,7 +108,6 @@ public class NewPostActivity extends AppCompatActivity {
                     // used to create sessions ids in web applications and used to create transactions ids
                     // first parameter specifies the most significant bits of the UUID, and the second the least significant bits
                     // retrieve the timestamp
-
                     final String randomName = UUID.randomUUID().toString();
 
                     // here you have the absolute path of the file in the parameter

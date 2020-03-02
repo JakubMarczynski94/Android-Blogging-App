@@ -1,5 +1,4 @@
 package com.example.app;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,15 +19,15 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+// comments added
 
 public class CommentsActivity extends AppCompatActivity {
 
-     private EditText comment_field;
+    private EditText comment_field;
     private ImageView comment_post_btn;
 
     private RecyclerView comment_list;
@@ -44,14 +42,16 @@ public class CommentsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
-
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
 
         current_user_id = firebaseAuth.getCurrentUser().getUid();
+
+        // this is the extra information we have sent from the previous BlogRecyclerAdapter class
         blog_post_id = getIntent().getStringExtra("blog_post_id");
 
         comment_field = findViewById(R.id.comment_field);
@@ -65,23 +65,25 @@ public class CommentsActivity extends AppCompatActivity {
         comment_list.setLayoutManager(new LinearLayoutManager(this));
         comment_list.setAdapter(commentsRecyclerAdapter);
 
-
         firebaseFirestore.collection("Posts/" + blog_post_id + "/Comments")
                 .addSnapshotListener(CommentsActivity.this, new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
 
+                        // suppose that we do find some data in the comments under this post
                         if (!documentSnapshots.isEmpty()) {
 
+                            // iterate through the documents in this collection
                             for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
 
                                 if (doc.getType() == DocumentChange.Type.ADDED) {
 
+                                    // each comment has an id
                                     String commentId = doc.getDocument().getId();
+                                    // looks like this data from firestore has been converted into an instance of the comments class
                                     Comments comments = doc.getDocument().toObject(Comments.class);
                                     commentsList.add(comments);
                                     commentsRecyclerAdapter.notifyDataSetChanged();
-
 
                                 }
                             }
@@ -97,8 +99,9 @@ public class CommentsActivity extends AppCompatActivity {
 
                 String comment_message = comment_field.getText().toString();
 
-
                 Map<String, Object> commentsMap = new HashMap<>();
+
+                // the data that will be added into firebase and which is associated to this comment
                 commentsMap.put("message", comment_message);
                 commentsMap.put("user_id", current_user_id);
                 commentsMap.put("timestamp", FieldValue.serverTimestamp());
@@ -113,6 +116,7 @@ public class CommentsActivity extends AppCompatActivity {
 
                         } else {
 
+                            // if we were successful in posting the comment, we just set the field to having no string, allowing us to post a comment a second time
                             comment_field.setText("");
 
                         }
