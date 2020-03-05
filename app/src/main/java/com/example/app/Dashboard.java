@@ -436,33 +436,38 @@ public class Dashboard extends AppCompatActivity {
 
                         if (task.getResult().exists()) {
 
+                            // here we have set the name if it exists in firestore
                             String name = task.getResult().getString("name");
                             setupName.setText(name);
-
-                            if (task.getResult().getString("image") != null) {
-
-                                String image = task.getResult().getString("image");
-
-                                mainImageURI = Uri.parse(image);
-
-                                RequestOptions placeholderRequest = new RequestOptions();
-                                placeholderRequest.placeholder(R.drawable.default_image);
-
-                                Glide.with(Dashboard.this).setDefaultRequestOptions(placeholderRequest).load(image).into(setupImage);
-
-                            }
 
                         } else {
 
                             if (task.getException() != null){
                                 String error = task.getException().getMessage();
                                 Toast.makeText(Dashboard.this, "(FIRESTORE Retrieve Error) : " + error, Toast.LENGTH_LONG).show();
-                             }
+                            }
                         }
                     }
                 }
             });
 
+            // this profile picture is not mandatory, and there is a default image if the user does not want to set a picture
+            storageReference.child("profile_images").child(user_id + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+
+                    // we also need to set the correct username if it exists in firestore
+                    StorageReference profile_reference = storageReference.child("profile_images").child(user_id + ".jpg");
+                    GlideApp.with(Dashboard.this).load(profile_reference).placeholder(R.drawable.default_image).into(setupImage);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    // in the case when we do not find a profile image then we just set this image resource to the default
+                    // the name is also not set in this case, no error warning is emitted
+                    setupImage.setImageResource(R.drawable.default_image);
+                }
+            });
 
             setupBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -470,13 +475,19 @@ public class Dashboard extends AppCompatActivity {
 
                     final String user_name = setupName.getText().toString();
 
+                    // here for some reason we input the URI, and check whether it is not null
                     if (!TextUtils.isEmpty(user_name) && mainImageURI != null) {
 
                         if (isChanged) {
 
                             user_id = auth.getCurrentUser().getUid();
+                            // the uri is like a pointer to some other content and changes with time
+                            // the url also specify how to get to the resource, and the uri just name the resource
+                            // URNs are like URIs but also require to be unique
 
+                            // the uri.getPath() and uri.toString() return two different things
                             File newImageFile = new File(mainImageURI.getPath());
+
                             try {
 
                                 compressedImageFile = new Compressor(Dashboard.this)
@@ -489,16 +500,21 @@ public class Dashboard extends AppCompatActivity {
                                 e.printStackTrace();
                             }
 
+                            // used to write data into files written into an array of bytes and then sent to multiple files
+                            // it holds a copy of data and sends it to multiple streams
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             compressedImageFile.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                            // put into the byte array output stream, and then the method toByteArray is used to create a newly allocated byte array
                             byte[] thumbData = baos.toByteArray();
 
+                            // putBytes() takes a byte[] and returns an upload task, this requires the app to contain the entire contents of a file at once
                             UploadTask image_path = storageReference.child("profile_images").child(user_id + ".jpg").putBytes(thumbData);
 
                             image_path.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
+                                    // suppose that now we have stored in the storage the byte[] array containing our image
                                     if (task.isSuccessful()) {
                                         storeFirestore(task, user_name);
 
@@ -513,6 +529,7 @@ public class Dashboard extends AppCompatActivity {
 
                         } else {
 
+                            // supposing that the image is not changed, hence it is the same, we still refer to the inner function firestore but the task here is null
                             storeFirestore(null, user_name);
 
                         }
@@ -527,15 +544,20 @@ public class Dashboard extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
+                    // on the right hand side we have the version code for the marshmallow platform
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 
+                        // to declare that an app needs a permission, this is written in the android manifest, the user needs to approve the persmissions are runtime
+                        // the expression below checks if we have the required permission, here first we treat the case when the permission is not granted
                         if(ContextCompat.checkSelfPermission(Dashboard.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 
                             Toast.makeText(Dashboard.this, "Permission Denied", Toast.LENGTH_LONG).show();
+                            // here a standard android dialog pops up which we can not customize
                             ActivityCompat.requestPermissions(Dashboard.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
                         } else {
 
+                            // supposing that we have the permission indeed to access the gallery then that is what we do
                             BringImagePicker();
 
                         }
@@ -635,48 +657,14 @@ public class Dashboard extends AppCompatActivity {
     }
 
     // ---------------------- setup methods ----------------------
+    // we keep the below code in order to add the usernam of the user
 
     private void storeFirestore(@NonNull Task<UploadTask.TaskSnapshot> task, String user_name) {
 
-
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         String user_id = auth.getCurrentUser().getUid();
-
-       // if(task != null) {
-            // removed the getResult() before getMetadata
-            // download_uri = task.getResult().getMetadata().getReference().getDownloadUrl().toString();
-            // download_uri = task.getResult().toString();
-
-         storageRef.child("profile_images").child(user_id + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-
-                @Override
-                public void onSuccess(Uri uri) {
-                    download_uri = uri.toString();
-                }
-
-            }).addOnFailureListener(new OnFailureListener() {
-
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-
-                    Toast.makeText(Dashboard.this, "No profile image found yet", Toast.LENGTH_LONG).show();
-                }
-            });
-
-       // } else {
-
-       //     download_uri = mainImageURI.toString();
-
-      //  }
-
-        if (download_uri== null){
-            download_uri = mainImageURI.toString();
-            Toast.makeText(Dashboard.this, "Profile image set to null", Toast.LENGTH_LONG).show();
-        }
 
         Map<String, String> userMap = new HashMap<>();
         userMap.put("name", user_name);
-        userMap.put("image", download_uri);
 
         firebaseFirestore.collection("Users").document(user_id).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -685,23 +673,19 @@ public class Dashboard extends AppCompatActivity {
                 if(task.isSuccessful()){
 
                     Toast.makeText(Dashboard.this, "The user Settings are updated.", Toast.LENGTH_LONG).show();
-                    //Intent mainIntent = new Intent(Dashboard.this, MainActivity.class);
-                    //startActivity(mainIntent);
-                    //finish();
 
                 } else {
 
                     String error = task.getException().getMessage();
                     Toast.makeText(Dashboard.this, "(FIRESTORE Error) : " + error, Toast.LENGTH_LONG).show();
-
                 }
-
             }
         });
 
-
     }
 
+
+    // these two methods below though are still necessary
     private void BringImagePicker() {
 
         CropImage.activity()
@@ -718,6 +702,9 @@ public class Dashboard extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
 
+                // suppose that the image was indeed cropped then the result is called result
+                // then we get the Uri or the name of the result, it's like a pointer on the result and we set the uri of the circle to this one
+                // in this case the image really has been changed
                 mainImageURI = result.getUri();
                 setupImage.setImageURI(mainImageURI);
 
@@ -725,7 +712,9 @@ public class Dashboard extends AppCompatActivity {
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
 
+                // supposing that there is an error while cropping the image then we actually display the error in a toast
                 Exception error = result.getError();
+                Toast.makeText(this, "The error with the crop :" + error.toString(), Toast.LENGTH_SHORT).show();
 
             }
         }
