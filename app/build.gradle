@@ -48,18 +48,22 @@ dependencies {
 
     // for post
     implementation 'com.google.android.material:material:1.1.0'
-    implementation 'com.google.firebase:firebase-firestore:21.4.0'
+    implementation 'com.google.firebase:firebase-firestore:21.4.1'
     implementation 'com.google.firebase:firebase-storage:19.1.1'
 
     // for post
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.6.+'
-    implementation 'com.github.bumptech.glide:glide:4.6.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    implementation 'com.github.bumptech.glide:annotations:4.8.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
     implementation 'id.zelory:compressor:2.1.0'
 
     // for post display
     implementation 'com.google.android.material:material:1.0.0-rc01'
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.firebaseui:firebase-ui-storage:6.2.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
+    annotationProcessor 'androidx.annotation:annotation:1.1.0'
 
 }
