@@ -25,6 +25,9 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
@@ -86,7 +89,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         String thumbUri = blog_list.get(position).getImage_thumb();
         holder.setBlogImage(image_url, thumbUri);
 
-        String user_id = blog_list.get(position).getUser_id();
+        final String user_id = blog_list.get(position).getUser_id();
 
         // we go into the firestore database and get all the data under the user_id name from the users collection
         firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -96,9 +99,10 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
                 if(task.isSuccessful()){
 
                     String userName = task.getResult().getString("name");
-                    String userImage = task.getResult().getString("image");
+                    // String userID = task.getResult().getString("userID");
 
-                    holder.setUserData(userName, userImage);
+                    // the user_id associated with the person who posted the image
+                    holder.setUserData(userName, user_id);
 
 
                 } else {
@@ -256,6 +260,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             requestOptions.placeholder(R.drawable.image_placeholder);
 
             // you load your picture into the image_placeholder, and the thumbnail too
+
             Glide.with(context).applyDefaultRequestOptions(requestOptions).load(downloadUri).thumbnail(
                     Glide.with(context).load(thumbUri)
             ).into(blogImageView);
@@ -269,17 +274,21 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
         }
 
-        public void setUserData(String name, String image){
+        public void setUserData(String name, String user_id){
 
             blogUserImage = mView.findViewById(R.id.blog_user_image);
             blogUserName = mView.findViewById(R.id.blog_user_name);
 
             blogUserName.setText(name);
 
-            RequestOptions placeholderOption = new RequestOptions();
-            placeholderOption.placeholder(R.drawable.profile_placeholder);
+            // RequestOptions placeholderOption = new RequestOptions();
+            // placeholderOption.placeholder(R.drawable.profile_placeholder);
 
-            Glide.with(context).applyDefaultRequestOptions(placeholderOption).load(image).into(blogUserImage);
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+            StorageReference profile_reference = storageReference.child("profile_images").child(user_id + ".jpg");
+            GlideApp.with(context).load(profile_reference).placeholder(R.drawable.default_image).into(blogUserImage);
+
+            //Glide.with(context).applyDefaultRequestOptions(placeholderOption).load(image).into(blogUserImage);
 
         }
 
