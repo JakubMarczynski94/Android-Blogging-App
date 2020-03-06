@@ -45,10 +45,8 @@ public class CommentsActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
-
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
-
         current_user_id = firebaseAuth.getCurrentUser().getUid();
 
         // this is the extra information we have sent from the previous BlogRecyclerAdapter class
@@ -126,6 +124,5 @@ public class CommentsActivity extends AppCompatActivity {
 
             }
         });
-
     }
 }
