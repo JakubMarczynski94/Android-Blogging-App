@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.Gravity;
@@ -37,6 +38,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 // comments added
 
 public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapter.ViewHolder> {
+
+    //
+    public boolean isTextVisible = false;
 
     // we will have a list of blog posts
     public List<BlogPost> blog_list;
@@ -78,11 +82,17 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         final String blogPostId = blog_list.get(position).BlogPostId;
         final String currentUserId = firebaseAuth.getCurrentUser().getUid();
 
-        // here you use a getter method to get the descrption of that specific blog post
+        // here you use a getter method to get the description of that specific blog post
         String desc_data = blog_list.get(position).getDesc();
+        String title_data = blog_list.get(position).get_title();
+        String location_data = blog_list.get(position).get_location();
+        String text_data = blog_list.get(position).get_text();
 
         // here ViewHolder is a class that we define ourselves below
-        holder.setDescText(desc_data);
+        holder.setDescView(desc_data);
+        holder.setTitleView(title_data);
+        holder.setLocationView(location_data);
+        holder.setTextView(text_data);
 
         // to get all this data we use the get and set methods from the BlogPost class which we defined previously
         String image_url = blog_list.get(position).getImage_url();
@@ -90,6 +100,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         holder.setBlogImage(image_url, thumbUri);
 
         final String user_id = blog_list.get(position).getUser_id();
+
 
         // we go into the firestore database and get all the data under the user_id name from the users collection
         firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -100,10 +111,8 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
                     String userName = task.getResult().getString("name");
                     // String userID = task.getResult().getString("userID");
-
                     // the user_id associated with the person who posted the image
                     holder.setUserData(userName, user_id);
-
 
                 } else {
 
@@ -142,6 +151,27 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
                 } else {
 
                     holder.updateLikesCount(0);
+
+                }
+
+            }
+        });
+
+        // documentSnapshots is the result if we do retrieve it, and e is the error if we fail to retrieve the right data
+        firebaseFirestore.collection("Posts/" + blogPostId + "/Comments").addSnapshotListener( new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+
+                if(!documentSnapshots.isEmpty()){
+
+                    // is the number of likes that we got for this specific blog post
+                    int count = documentSnapshots.size();
+                    // method to update the number of likes related to our specific blog post
+                    holder.updateCommentsCount(count);
+
+                } else {
+
+                    holder.updateCommentsCount(0);
 
                 }
 
@@ -212,6 +242,20 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             }
         });
 
+        holder.rawBlog.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v){
+                if(isTextVisible == false){
+                    holder.TextVisibilityOn();
+                    isTextVisible = true;
+                } else {
+                    holder.TextVisibilityOff();
+                    isTextVisible = false;
+                }
+            }
+         });
+
     }
 
     // counts the number of items in recycler adapter, we want to count the number of items to populate in recycler view
@@ -227,28 +271,53 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private View mView;
+        private TextView titleView;
         private TextView descView;
+        private TextView textView;
         private ImageView blogImageView;
         private TextView blogDate;
+        private TextView blogLocation;
         private TextView blogUserName;
         private CircleImageView blogUserImage;
         private ImageView blogLikeBtn;
         private TextView blogLikeCount;
+        private TextView blogCommentCount;
         private ImageView blogCommentBtn;
+        private ConstraintLayout rawBlog;
 
         public ViewHolder(View itemView) {
+
             super(itemView);
             mView = itemView;
 
             // assign to these imageviews a part of an XML file
             blogLikeBtn = mView.findViewById(R.id.blog_like_btn);
             blogCommentBtn = mView.findViewById(R.id.blog_comment_icon);
+            rawBlog = mView.findViewById(R.id.raw_blog);
         }
 
-        public void setDescText(String descText){
+        public void setTitleView(String titleText){
+            titleView = mView.findViewById(R.id.blog_title);
+            titleView.setText(titleText);
+        }
+
+        public void setDescView(String descText){
 
             descView = mView.findViewById(R.id.blog_desc);
             descView.setText(descText);
+        }
+
+        public void setTextView(String actualText){
+            textView = mView.findViewById(R.id.blog_text);
+            textView.setText(actualText);
+        }
+
+        public void TextVisibilityOn(){
+            textView.setVisibility(View.VISIBLE);
+        }
+
+        public void TextVisibilityOff(){
+            textView.setVisibility(View.GONE);
         }
 
         public void setBlogImage(String downloadUri, String thumbUri){
@@ -274,6 +343,11 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
         }
 
+        public void setLocationView(String location){
+            blogLocation = mView.findViewById(R.id.location);
+            blogLocation.setText(location);
+        }
+
         public void setUserData(String name, String user_id){
 
             blogUserImage = mView.findViewById(R.id.blog_user_image);
@@ -297,6 +371,11 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             blogLikeCount = mView.findViewById(R.id.blog_like_count);
             blogLikeCount.setText(count + " Likes");
 
+        }
+
+        public void updateCommentsCount(int count){
+            blogCommentCount = mView.findViewById(R.id.blog_comment_count);
+            blogCommentCount.setText(count + " Comments");
         }
 
     }

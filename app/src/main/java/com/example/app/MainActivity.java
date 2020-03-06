@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -62,6 +63,7 @@ import java.util.List;
 import android.widget.SearchView;
 import android.app.SearchManager;
 import android.content.ComponentName;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -198,6 +200,11 @@ public class MainActivity extends AppCompatActivity {
 
                                 String blogPostId = doc.getDocument().getId();
                                 BlogPost blogPost = doc.getDocument().toObject(BlogPost.class).withId(blogPostId);
+
+                                // manually set the timestamp as a date
+                                Timestamp timestamp = (Timestamp)doc.getDocument().get("timestamp");
+                                Date date = timestamp.toDate();
+                                blogPost.setTimestamp(date);
 
                                 if (isFirstPageFirstLoad) {
 
