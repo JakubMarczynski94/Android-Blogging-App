@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -18,8 +19,12 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +84,14 @@ public class CommentsActivity extends AppCompatActivity {
                                     // each comment has an id
                                     String commentId = doc.getDocument().getId();
                                     // looks like this data from firestore has been converted into an instance of the comments class
+                                    // getDocument returns QueryDocumentSnapshot
                                     Comments comments = doc.getDocument().toObject(Comments.class);
+                                    /*
+                                    QueryDocumentSnapshot querySnapshot = doc.getDocument();
+                                    Map<String, Object> mapQuery = querySnapshot.getData();
+                                    Timestamp timestamp = (Timestamp) mapQuery.get("timestamp");
+                                    comments.setTimestamp(timestamp.toDate()); */
+
                                     commentsList.add(comments);
                                     commentsRecyclerAdapter.notifyDataSetChanged();
 

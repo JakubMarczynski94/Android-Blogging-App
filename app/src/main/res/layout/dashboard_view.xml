@@ -34,25 +34,11 @@
         app:navGraph="@navigation/mobile_navigation"
         app:startDestination="@+id/dashboard"/>
 
-    <TextView
-        android:id="@+id/noUsersText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="No users found!"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ListView
-        android:id="@+id/usersList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/noUsersText" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="100dp"
-        app:layout_constraintTop_toBottomOf="@id/usersList"
+        app:layout_constraintTop_toTopOf="@id/nav_host_fragment"
         android:id="@+id/scroll">
 
         <LinearLayout
@@ -61,200 +47,92 @@
             android:orientation="vertical"
             android:id="@+id/linear2">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/Settings"
+                android:id="@+id/settings"
+                android:clickable="true"
+                android:focusable="true"
+                android:textSize="18dp"
+                android:layout_marginEnd="20dp"
+                android:gravity="right"/>
+
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/setup_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_marginTop="16dp"
                 android:src="@drawable/default_image"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_gravity="center"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayoutSetup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
             <EditText
                 android:id="@+id/setup_name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="64dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="125dp"
+                android:layout_marginStart="125dp"
                 android:ems="10"
                 android:hint="@string/setup_name_hint_text"
                 android:inputType="textPersonName"
                 android:padding="15dp"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/setup_image" />
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="@+id/constraintLayoutSetup" />
 
-            <Button
-                android:id="@+id/setup_btn"
+            <TextView
+                android:id="@+id/setup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="30dp"
                 android:backgroundTint="@color/colorAccent"
-                android:padding="15dp"
                 android:text="@string/setup_btn_name_text"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/setup_name" />
+                app:layout_constraintStart_toEndOf="@id/setup_name"
+                app:layout_constraintTop_toTopOf="@+id/constraintLayoutSetup" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:id="@+id/linear1"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingTop="@dimen/activity_vertical_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="@dimen/activity_vertical_margin"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    app:layout_constraintTop_toBottomOf="@id/setup_btn">
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <EditText
-                        android:id="@+id/old_email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/hint_email"
-                        android:inputType="textEmailAddress"
-                        android:maxLines="1"
-                        android:singleLine="true" />
-
-                    <EditText
-                        android:id="@+id/new_email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/hint_new_email"
-                        android:inputType="textEmailAddress"
-                        android:maxLines="1"
-                        android:singleLine="true" />
-
-                    <!--  android:imeActionId="@+id/login"
-                        android:imeOptions="actionUnspecified" -->
-
-                    <EditText
-                        android:id="@+id/password"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusableInTouchMode="true"
-                        android:hint="@string/prompt_password"
-                        android:inputType="textPassword"
-                        android:maxLines="1"
-                        android:singleLine="true" />
-
-                    <!--
-                        android:inputType="textPassword"
-                        android:maxLines="1" -->
-
-                    <EditText
-                        android:id="@+id/newPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusableInTouchMode="true"
-                        android:hint="@string/new_pass"
-                        android:singleLine="true" />
-
-                    <Button
-                        android:id="@+id/changeEmail"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:background="@color/colorPrimaryDark"
-                        android:text="@string/btn_change"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/changePass"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:background="@color/colorPrimaryDark"
-                        android:text="@string/btn_change"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/send"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:background="@color/colorPrimaryDark"
-                        android:text="@string/btn_send"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold" />
-
-
-                    <Button
-                        android:id="@+id/remove"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:background="@color/colorPrimaryDark"
-                        android:text="@string/btn_remove"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/change_email_button"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="@string/change_email"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/change_password_button"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="@string/change_password"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/sending_pass_reset_button"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="@string/send_password_reset_email"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/remove_user_button"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="@string/remove_user"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/sign_out"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:background="@color/colorPrimary"
-                        android:text="@string/btn_sign_out"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:layout_marginTop="15dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/Messages"
+            android:id="@+id/takeToMessages"
+            app:layout_constraintTop_toBottomOf="@+id/scroll"/>
+
     </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/myposts_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scroll">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/myblog_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
