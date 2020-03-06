@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -59,6 +60,8 @@ import android.net.Uri;
 import android.os.Build;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -73,8 +76,13 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -96,7 +104,19 @@ import id.zelory.compressor.Compressor;
 
 public class SearchActivity extends AppCompatActivity {
 
-    TextView test;
+    // for post display
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore firebaseFirestore;
+    private String current_user_id;
+    private RecyclerView blog_list_view;
+    // list of class elements
+    private List<BlogPost> blog_list;
+    private FirebaseAuth firebaseAuth;
+    private BlogRecyclerAdapter blogRecyclerAdapter;
+    private DocumentSnapshot lastVisible;
+    private Boolean isFirstPageFirstLoad = true;
+    public String query;
+    Query nextQuery;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,12 +125,8 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.search);
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
+            query = intent.getStringExtra(SearchManager.QUERY);
             doMySearch(query);
-
-            // below we verify that the query is actually sent to this activity and can be displayed
-            test = findViewById(R.id.test_text);
-            test.setText(query);
         }
     }
 
@@ -131,6 +147,148 @@ public class SearchActivity extends AppCompatActivity {
     */
 
     public void doMySearch(String query){
-        // for the moment I have not specified what the method does
+
+        // need to change the code below in order to append the correct blogs into this activity
+
+        blog_list = new ArrayList<>();
+        blog_list_view = findViewById(R.id.searchblog_list_view);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        // contains list of blog posts
+        blogRecyclerAdapter = new BlogRecyclerAdapter(blog_list);
+        ViewGroup container = findViewById(R.id.search_container);
+        blog_list_view.setLayoutManager(new LinearLayoutManager(container.getContext()));
+        blog_list_view.setAdapter(blogRecyclerAdapter);
+        blog_list_view.setHasFixedSize(true);
+
+        // which we made sure is correct by forcing login when you open the main activity
+        if(firebaseAuth.getCurrentUser() != null) {
+
+            firebaseFirestore = FirebaseFirestore.getInstance();
+
+            blog_list_view.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+
+                    Boolean reachedBottom = !recyclerView.canScrollVertically(1);
+
+                    if(reachedBottom){
+
+                        loadMorePost();
+
+                    }
+
+                }
+            });
+
+            Query firstQuery = firebaseFirestore.collection("Posts").whereArrayContains("tags", query).limit(3);
+            firstQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+
+                    if (!documentSnapshots.isEmpty()) {
+                        // we found the document snapshot is not empty
+                        // Toast.makeText(SearchActivity.this, "Document snapshot is not empty", Toast.LENGTH_SHORT).show();
+
+                        if (isFirstPageFirstLoad) {
+
+                            lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
+                            blog_list.clear();
+                        }
+
+                        for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
+
+                            if (doc.getType() == DocumentChange.Type.ADDED) {
+
+                                String blogPostId = doc.getDocument().getId();
+                                BlogPost blogPost = doc.getDocument().toObject(BlogPost.class).withId(blogPostId);
+
+                                if (isFirstPageFirstLoad) {
+                                    // we get to this stage
+                                    // Toast.makeText(SearchActivity.this, "we add the blogpost to the list", Toast.LENGTH_SHORT).show();
+                                    blog_list.add(blogPost);
+
+                                } else {
+
+                                    blog_list.add(0, blogPost);
+
+                                }
+
+                                blogRecyclerAdapter.notifyDataSetChanged();
+
+                            }
+                        }
+
+                        isFirstPageFirstLoad = false;
+
+                    }
+
+                }
+
+            });
+
+        }
+
+    }
+
+    // need to change the below code
+    public void loadMorePost(){
+
+        if(firebaseAuth.getCurrentUser() != null) {
+
+            firebaseFirestore.collection("Posts").whereArrayContains("tags", query)
+                    .startAfter(lastVisible).limit(3).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                    if (!queryDocumentSnapshots.isEmpty()) {
+
+                        lastVisible = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
+                        for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+
+                            if (doc.getType() == DocumentChange.Type.ADDED) {
+
+                                String blogPostId = doc.getDocument().getId();
+                                BlogPost blogPost = doc.getDocument().toObject(BlogPost.class).withId(blogPostId);
+                                blog_list.add(blogPost);
+
+                                blogRecyclerAdapter.notifyDataSetChanged();
+                            }
+
+                        }
+                    }
+                }
+            });
+
+        /*
+        nextQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+
+                            if (!documentSnapshots.isEmpty()) {
+
+                                lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
+                                for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
+
+                                    if (doc.getType() == DocumentChange.Type.ADDED) {
+
+                                        String blogPostId = doc.getDocument().getId();
+                                        BlogPost blogPost = doc.getDocument().toObject(BlogPost.class).withId(blogPostId);
+                                        blog_list.add(blogPost);
+
+                                        blogRecyclerAdapter.notifyDataSetChanged();
+                                    }
+
+                                }
+                            }
+
+                        }
+                    }); */
+
+
+        }
+
     }
 }
