@@ -72,5 +72,12 @@
         <!-- added with second activity for post -->
         <activity android:name=".NewPostActivity2"/>
 
+        <!-- added for dashboard refinement -->
+        <activity android:name=".Settings"
+                  android:parentActivityName="com.example.app.Dashboard"/>
+
+        <activity android:name=".Messages"
+                  android:parentActivityName="com.example.app.Dashboard"/>
+
     </application>
 </manifest>

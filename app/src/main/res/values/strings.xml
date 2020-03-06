@@ -44,7 +44,7 @@
     <string name="post_next_part">Next</string>
     <string name="new_post_btn_hint">Post</string>
 
-    <string name="setup_name_hint_text">set name</string>
+    <string name="setup_name_hint_text">Set username</string>
     <string name="setup_btn_name_text">setup</string>
 
     <!-- added with the search bar -->
@@ -55,4 +55,8 @@
     <string name="post_desc">Description</string>
     <string name="tags">Tags separated by spaces</string>
     <string name="post_location">Location</string>
+
+    <!-- added with refinement of dashboard -->
+    <string name="Settings">Settings</string>
+    <string name="Messages">Messages</string>
 </resources>
