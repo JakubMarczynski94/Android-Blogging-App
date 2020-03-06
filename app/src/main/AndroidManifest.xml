@@ -69,5 +69,8 @@
                 android:value="com.example.app.MainActivity" />
         </activity>
 
+        <!-- added with second activity for post -->
+        <activity android:name=".NewPostActivity2"/>
+
     </application>
 </manifest>

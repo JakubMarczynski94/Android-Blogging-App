@@ -41,6 +41,7 @@
     <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
     <string name="prompt_password"> input password</string>
     <string name="post_desc_hint">Write your post</string>
+    <string name="post_next_part">Next</string>
     <string name="new_post_btn_hint">Post</string>
 
     <string name="setup_name_hint_text">set name</string>
@@ -48,5 +49,10 @@
 
     <!-- added with the search bar -->
     <string name="search_hint">Search</string>
-    <!-- -->
+
+    <!-- added with new post the second part -->
+    <string name="post_title">Title</string>
+    <string name="post_desc">Description</string>
+    <string name="tags">Tags separated by spaces</string>
+    <string name="post_location">Location</string>
 </resources>

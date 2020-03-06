@@ -31,6 +31,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -220,7 +221,7 @@ public class NewPostActivity extends AppCompatActivity {
                                         Map<String, Object> postMap = new HashMap<>();
                                         postMap.put("image_url", downloadUri);
                                         postMap.put("image_thumb", downloadthumbUri);
-                                        postMap.put("desc", desc);
+                                        postMap.put("text", desc);
                                         // the user who logged in posted the image
                                         postMap.put("user_id", current_user_id);
                                         // when the post has been posted
@@ -254,26 +255,30 @@ public class NewPostActivity extends AppCompatActivity {
                                          */
                                         // END OF TEST -------------------------
 
-                                        firebaseFirestore.collection("Posts").add(postMap).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                                        final String timestampString = timestamp.toString();
+
+                                        firebaseFirestore.collection("Posts").document(current_user_id + timestampString)
+                                                .set(postMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
-                                            public void onComplete(@NonNull Task<DocumentReference> task) {
+                                            public void onSuccess(Void aVoid) {
 
-                                                if(task.isSuccessful()){
-                                                    // go to blog post page and show a text
-                                                    Toast.makeText(NewPostActivity.this, "Post was added", Toast.LENGTH_LONG).show();
-                                                    // then we want to go to our main page, and we want to make sure the user can't press the back button so add finish()
-                                                    Intent mainIntent = new Intent(NewPostActivity.this, MainActivity.class);
-                                                    startActivity(mainIntent);
-                                                    finish();
-
-                                                } else {
-
-                                                    Toast.makeText(NewPostActivity.this, "Post was added to storage but not to firestore", Toast.LENGTH_LONG).show();
-                                                }
+                                                // go to blog post page and show a text
+                                                Toast.makeText(NewPostActivity.this, "Part 1 was added", Toast.LENGTH_LONG).show();
+                                                // then we want to go to our main page, and we want to make sure the user can't press the back button so add finish()
+                                                Intent mainIntent = new Intent(NewPostActivity.this, NewPostActivity2.class);
+                                                mainIntent.putExtra("firestoreDocumentName", current_user_id + timestampString);
+                                                startActivity(mainIntent);
+                                                finish();
 
                                                 // progressbar should disappear in both cases
                                                 newPostProgress.setVisibility(View.INVISIBLE);
 
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(NewPostActivity.this, "Part 1 was added to storage but not to firestore", Toast.LENGTH_SHORT).show();
                                             }
                                         });
 
@@ -282,7 +287,7 @@ public class NewPostActivity extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
 
-                                        Toast.makeText(NewPostActivity.this, "Post was not added to storage", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(NewPostActivity.this, "Part 1 was not added to storage", Toast.LENGTH_LONG).show();
 
                                     }
                                 });
