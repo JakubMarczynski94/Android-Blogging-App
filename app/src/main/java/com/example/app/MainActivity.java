@@ -59,6 +59,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.widget.SearchView;
+import android.app.SearchManager;
+import android.content.ComponentName;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -79,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
     private Boolean isFirstPageFirstLoad = true;
     //
 
+    // for the search
+    SearchView editsearch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.featured, R.id.dashboard, R.id.apply)
                 .build();
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
@@ -219,6 +226,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // --------------- end for featuring display
+
+        // ------------------ for the search bar
+        editsearch = (SearchView) findViewById(R.id.search);
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        editsearch.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchActivity.class)));
+        editsearch.setQueryHint(getResources().getString(R.string.search_hint));
     }
 
     // --- when you log in you have to log in with email
@@ -277,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
 }
 
 

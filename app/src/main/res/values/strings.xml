@@ -45,4 +45,8 @@
 
     <string name="setup_name_hint_text">set name</string>
     <string name="setup_btn_name_text">setup</string>
+
+    <!-- added with the search bar -->
+    <string name="search_hint">Search</string>
+    <!-- -->
 </resources>
