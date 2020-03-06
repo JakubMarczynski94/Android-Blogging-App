@@ -104,20 +104,19 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:layout_marginTop="15dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/Messages"
+                android:id="@+id/takeToMessages"
+                app:layout_constraintTop_toBottomOf="@+id/scroll"/>
+
         </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:gravity="center"
-            android:layout_marginTop="15dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:text="@string/Messages"
-            android:id="@+id/takeToMessages"
-            app:layout_constraintTop_toBottomOf="@+id/scroll"/>
-
     </ScrollView>
 
     <FrameLayout
