@@ -89,5 +89,7 @@
 
         </activity>
 
+    <activity android:name= ".MessagesAdapter"/>
+    <activity android:name=".RecyclerItemClickListener"/>
     </application>
 </manifest>
