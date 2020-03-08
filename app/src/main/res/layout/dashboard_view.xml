@@ -20,7 +20,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/bottom_nav_menu" />
 
-
     <fragment
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -34,7 +33,7 @@
         app:navGraph="@navigation/mobile_navigation"
         app:startDestination="@+id/dashboard"/>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="100dp"
@@ -54,9 +53,9 @@
                 android:id="@+id/settings"
                 android:clickable="true"
                 android:focusable="true"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:layout_marginEnd="20dp"
-                android:gravity="right"/>
+                android:gravity="end"/>
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/setup_image"
@@ -107,31 +106,44 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:gravity="center"
                 android:layout_marginTop="15dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:text="@string/Messages"
                 android:id="@+id/takeToMessages"
-                app:layout_constraintTop_toBottomOf="@+id/scroll"/>
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayoutSetup"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:layout_marginTop="15dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/MyPosts"
+                android:id="@+id/takeToMyPosts"
+                app:layout_constraintTop_toBottomOf="@+id/takeToMessages"/>
+
+            <FrameLayout
+                android:id="@+id/myposts_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/takeToMyPosts">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/myblog_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
 
         </LinearLayout>
-    </ScrollView>
 
-    <FrameLayout
-        android:id="@+id/myposts_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="100dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scroll">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/myblog_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </FrameLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
