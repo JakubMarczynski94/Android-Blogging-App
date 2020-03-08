@@ -1,5 +1,6 @@
 package com.example.app;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,15 +10,26 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class Chat extends AppCompatActivity {
 
@@ -26,7 +38,12 @@ public class Chat extends AppCompatActivity {
     EditText messageArea;
     ScrollView scrollView;
     Firebase reference1, reference2;
+    String correspondent;
+    TextView correspondent_name;
+    CircleImageView correspondent_image;
     String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +54,33 @@ public class Chat extends AppCompatActivity {
         sendButton = (ImageView)findViewById(R.id.sendButton);
         messageArea = (EditText)findViewById(R.id.messageArea);
         scrollView = (ScrollView)findViewById(R.id.scrollView);
+        correspondent_name = (TextView) findViewById(R.id.correspondent_name);
+        correspondent_image = (CircleImageView) findViewById(R.id.correspondent_image);
+
+        StorageReference profile_reference = storageReference.child("profile_images").child(UserDetails.chatWith + ".jpg");
+        GlideApp.with(getBaseContext()).load(profile_reference).placeholder(R.drawable.default_image).into(correspondent_image);
 
         Firebase.setAndroidContext(this);
-
 
         // maybe the userDetaisl.email doesn't appear below because firebase doesn't allow symbols like @ to be in the name? The underscore appears though
         reference1 = new Firebase("https://appdata-67dc1.firebaseio.com/messages/" + user_id + "_" + UserDetails.chatWith);
         reference2 = new Firebase("https://appdata-67dc1.firebaseio.com/messages/" + UserDetails.chatWith + "_" + user_id);
+
+        // we go into the firestore database and get all the data under the user_id name from the users collection
+        firebaseFirestore.collection("Users").document(UserDetails.chatWith).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                if (task.isSuccessful()) {
+
+                    correspondent = task.getResult().getString("name");
+                    correspondent_name.setText(correspondent);
+
+                } else {
+                    Toast.makeText(Chat.this, "Wasn't able to access name of correspondent", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,10 +121,10 @@ public class Chat extends AppCompatActivity {
 
                 // since child contains one user and one message therefore here we can compare directly
                 if(userName.equals(user_id)){
-                    addMessageBox("You:-\n" + message, 1);
+                    addMessageBox(message, 1);
                 }
                 else{
-                    addMessageBox(UserDetails.chatWith + ":-\n" + message, 2);
+                    addMessageBox(message, 2);
                 }
             }
 
