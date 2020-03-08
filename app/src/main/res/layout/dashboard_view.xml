@@ -5,7 +5,6 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="?attr/actionBarSize"
     tools:context="com.example.app.MainActivity">
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -108,7 +107,8 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:gravity="center"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="15dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:text="@string/Messages"
@@ -121,8 +121,6 @@
                 android:textSize="20sp"
                 android:gravity="center"
                 android:layout_marginTop="15dp"
-                android:clickable="true"
-                android:focusable="true"
                 android:text="@string/MyPosts"
                 android:id="@+id/takeToMyPosts"
                 app:layout_constraintTop_toBottomOf="@+id/takeToMessages"/>
