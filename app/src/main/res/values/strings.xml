@@ -59,4 +59,5 @@
     <!-- added with refinement of dashboard -->
     <string name="Settings">Settings</string>
     <string name="Messages">Messages</string>
+    <string name="MyPosts">My Posts</string>
 </resources>

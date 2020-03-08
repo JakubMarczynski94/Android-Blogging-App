@@ -260,5 +260,13 @@ public class Settings extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        startActivity(new Intent(Settings.this, Dashboard.class));
+        finish();
+
+    }
 
 }

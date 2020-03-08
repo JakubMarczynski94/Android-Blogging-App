@@ -74,10 +74,20 @@
 
         <!-- added for dashboard refinement -->
         <activity android:name=".Settings"
-                  android:parentActivityName="com.example.app.Dashboard"/>
+            android:parentActivityName="com.example.app.Dashboard">
+
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.app.Dashboard" />
+        </activity>
 
         <activity android:name=".Messages"
-                  android:parentActivityName="com.example.app.Dashboard"/>
+                  android:parentActivityName="com.example.app.Dashboard">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.app.Dashboard" />
+
+        </activity>
 
     </application>
 </manifest>
